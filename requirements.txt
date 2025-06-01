@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+langchain==0.2.*
+langserve==0.0.48
+chromadb==0.4.*
+unstructured
+beautifulsoup4
+tiktoken
+openai
+pypdf
