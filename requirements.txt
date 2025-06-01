@@ -7,5 +7,6 @@ chromadb==0.4.*
 unstructured
 beautifulsoup4
 tiktoken
-openai
+langchain-google-genai
+google-generativeai
 pypdf
