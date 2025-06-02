@@ -13,3 +13,4 @@ langchain-google-genai==1.0.10
 google-generativeai
 pypdf
 httpx==0.26.*
+sse_starlette>=0.7.0 
