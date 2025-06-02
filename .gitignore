@@ -1,0 +1,11 @@
+# entornos
+.venv/
+__pycache__/
+# vectores persistidos
+db/
+faiss_index/
+# IDEs
+.idea/
+.vscode/
+# Docker artefacts
+*.pyc

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot Promtior RAG</title>
+  <style>
+    body { font-family: sans-serif; max-width: 680px; margin: 40px auto; }
+    textarea { width: 100%; height: 80px; }
+    button { padding: 8px 16px; margin-top: 8px; }
+    #respuesta { margin-top: 24px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Preguntale a Promtior 🤖</h1>
+  <textarea id="pregunta" placeholder="Ej: Cuando fue fundada Promtior?"></textarea>
+  <br/>
+  <button id="enviar">Enviar</button>
+
+  <div id="respuesta"></div>
+
+  <script>
+    const btn = document.getElementById("enviar");
+    btn.onclick = async () => {
+      const pregunta = document.getElementById("pregunta").value.trim();
+      if (!pregunta) return;
+
+      document.getElementById("respuesta").innerText = "⏳ Pensando…";
+
+      const res = await fetch("/rag/invoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({input: { question: pregunta }})
+      });
+
+      const data = await res.json();
+      const texto = data?.output?.result ?? "Error";   
+      document.getElementById("respuesta").innerText = texto;
+    };
+  </script>
+</body>
+</html>
