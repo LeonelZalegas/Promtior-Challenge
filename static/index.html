@@ -3,40 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chatbot Promtior RAG</title>
+  <title>Chat Promtior RAG</title>
+
+  <!-- Fuente Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: sans-serif; max-width: 680px; margin: 40px auto; }
-    textarea { width: 100%; height: 80px; }
-    button { padding: 8px 16px; margin-top: 8px; }
-    #respuesta { margin-top: 24px; white-space: pre-wrap; }
+    :root {
+      --bg: #f6f8fa;
+      --card-bg: #ffffff;
+      --primary: #0057ff;
+      --text: #202124;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Inter", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 680px;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 20px rgb(0 0 0 / .07);
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 110px;
+      resize: vertical;
+      padding: 0.9rem 1rem;
+      border: 1px solid #d0d7de;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      transition: border .2s;
+    }
+    textarea:focus { outline: none; border-color: var(--primary); }
+    .actions {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.4rem;
+      font-size: 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    button:hover { background: #0046d6; }
+    button:disabled { background: #9fb4ff; cursor: not-allowed; }
+
+    .respuesta {
+      margin-top: 2rem;
+      white-space: pre-wrap;
+      line-height: 1.45;
+      position: relative;
+      padding-left: 1.8rem;
+    }
+    /* ícono respuesta */
+    .respuesta::before {
+      content: "🤖";
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #cfd0d1;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 1rem auto 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --card-bg: #161b22;
+        --text: #e6edf3;
+        --primary: #4c8bff;
+      }
+      textarea { background: #0d1117; color: var(--text); }
+    }
   </style>
 </head>
 <body>
-  <h1>Preguntale a Promtior 🤖</h1>
-  <textarea id="pregunta" placeholder="Ej: Cuando fue fundada Promtior?"></textarea>
-  <br/>
-  <button id="enviar">Enviar</button>
 
-  <div id="respuesta"></div>
+<div class="card">
+  <h1>Preguntale a <strong>Promtior</strong> 🤖</h1>
 
-  <script>
-    const btn = document.getElementById("enviar");
-    btn.onclick = async () => {
-      const pregunta = document.getElementById("pregunta").value.trim();
-      if (!pregunta) return;
+  <textarea id="pregunta" placeholder="Ej: ¿Cuándo fue fundada Promtior?"></textarea>
 
-      document.getElementById("respuesta").innerText = "⏳ Pensando…";
+  <div class="actions">
+    <button id="enviar">Enviar</button>
+  </div>
 
+  <div id="respuesta" class="respuesta" style="display:none;"></div>
+  <div id="loading" class="spinner" style="display:none;"></div>
+</div>
+
+<script>
+  const preguntaEl = document.getElementById("pregunta");
+  const btn        = document.getElementById("enviar");
+  const respEl     = document.getElementById("respuesta");
+  const loadingEl  = document.getElementById("loading");
+
+  btn.onclick = async () => {
+    const pregunta = preguntaEl.value.trim();
+    if (!pregunta) return;
+
+    // UI state
+    respEl.style.display   = "none";
+    loadingEl.style.display = "block";
+    btn.disabled = true;
+
+    try {
       const res = await fetch("/rag/invoke", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({input: { question: pregunta }})
+        body: JSON.stringify({ input: { question: pregunta } })
       });
+      const data   = await res.json();
+      const texto  = data?.output?.result ?? "Lo siento, ocurrió un error.";
 
-      const data = await res.json();
-      const texto = data?.output?.result ?? "Error";   
-      document.getElementById("respuesta").innerText = texto;
-    };
-  </script>
+      respEl.innerText = texto;
+      respEl.style.display = "block";
+    } catch (e) {
+      respEl.innerText = "⚠️ No se pudo conectar con el servidor.";
+      respEl.style.display = "block";
+    } finally {
+      loadingEl.style.display = "none";
+      btn.disabled = false;
+    }
+  };
+</script>
 </body>
 </html>
