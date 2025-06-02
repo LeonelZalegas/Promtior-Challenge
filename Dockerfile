@@ -18,9 +18,6 @@ RUN pip install --upgrade pip \
 
 COPY . .
 
-# Pre-genera el vectorstore si ya existe la API-key; si no, sigue sin romper
-RUN python -m app.ingestion || true
-
 
 FROM python:3.11-slim
 
