@@ -2,11 +2,14 @@ fastapi
 uvicorn[standard]
 python-dotenv
 langchain==0.2.*
-langserve==0.0.48
+langchain-core==0.2.*
+langchain-community==0.2.*
+langserve==0.0.48         
 chromadb==0.4.*
 unstructured
 beautifulsoup4
 tiktoken
-langchain-google-genai
+langchain-google-genai==1.0.10
 google-generativeai
 pypdf
+httpx==0.26.*
